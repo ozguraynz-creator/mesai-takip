@@ -9,41 +9,25 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Mesai Takip">
-    <meta name="theme-color" content="#1e293b"> <!-- Koyu Slate rengi (Tarayıcı üst çubuğu) -->
+    <meta name="theme-color" content="#1e293b">
 
-    <!-- İKON TANIMLAMALARI (Tasarımınızı bu linklere yükleyeceksiniz) -->
-    <!-- Not: Şimdilik sistemin varsayılan şık bir SVG ikonunu koydum. Siz kendi görselinizi sunucuya atıp buradaki linkleri güncelleyebilirsiniz. -->
+    <!-- İKON TANIMLAMALARI (Altın Yaldızlı Derimod Konsepti) -->
     <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22%231a1a1a%22 rx=%2220%22/><path d=%22M50 20 A 30 30 0 1 0 50 80 A 30 30 0 1 0 50 20 Z%22 fill=%22none%22 stroke=%22%23d4af37%22 stroke-width=%224%22/><path d=%22M50 35 L 50 50 L 60 55%22 fill=%22none%22 stroke=%22%23d4af37%22 stroke-width=%224%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22/></svg>">
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22%231a1a1a%22 rx=%2220%22/><path d=%22M50 20 A 30 30 0 1 0 50 80 A 30 30 0 1 0 50 20 Z%22 fill=%22none%22 stroke=%22%23d4af37%22 stroke-width=%224%22/><path d=%22M50 35 L 50 50 L 60 55%22 fill=%22none%22 stroke=%22%23d4af37%22 stroke-width=%224%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22/></svg>">
 
-    <!-- Tailwind & React Kurulumu (Önizleme için) -->
+    <!-- Kütüphaneler (Babel güncellendi, çökme sorunu giderildi) -->
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-
-    <style>
-        /* Arayüzdeki ikonların düzgün render olması için */
-        i[data-lucide] { display: inline-block; width: 1em; height: 1em; stroke-width: 2; stroke: currentColor; fill: none; stroke-linecap: round; stroke-linejoin: round; }
-    </style>
+    
+    <!-- Daha stabil Phosphor İkon Kütüphanesi -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
 </head>
 <body class="bg-slate-50 antialiased selection:bg-yellow-600 selection:text-white">
     <div id="root"></div>
 
 <script type="text/babel">
-// Lucide ikonlarını React bileşeni gibi kullanmak için basit bir wrapper
-const Icon = ({ name, size = 24, className = "" }) => {
-    const iconRef = React.useRef();
-    React.useEffect(() => {
-        if (iconRef.current) {
-            lucide.createIcons({ icons: { [name]: lucide.icons[name] }, nameAttr: 'data-lucide', attrs: { class: className, width: size, height: size } });
-        }
-    }, [name, size, className]);
-    return <i ref={iconRef} data-lucide={name}></i>;
-};
-
 function App() {
   const currentMonthYear = new Date().toISOString().slice(0, 7);
 
@@ -146,6 +130,13 @@ function App() {
   }, { alacak: 0, kullanilan: 0 });
   const totalKalan = totals.alacak - totals.kullanilan;
 
+  // Güvenli başlık yazdırma işlemi
+  const getToplamBaslik = () => {
+    if (!filterPersonId) return "GENEL TOPLAM";
+    const p = getPerson(filterPersonId);
+    return p ? `${p.name} TOPLAM` : "TOPLAM";
+  };
+
   return (
     <div className="min-h-screen bg-[#f8f9fa] p-4 md:p-8 font-sans text-slate-800">
       
@@ -155,7 +146,7 @@ function App() {
           <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6">
             <div className="flex items-center gap-3 mb-4">
               <div className={`p-3 rounded-full ${modal.type === 'danger' ? 'bg-red-100 text-red-600' : 'bg-yellow-100 text-yellow-700'}`}>
-                <Icon name="AlertTriangle" size={24} />
+                <i className="ph ph-warning text-2xl"></i>
               </div>
               <h3 className="text-xl font-bold text-slate-900">{modal.title}</h3>
             </div>
@@ -172,8 +163,8 @@ function App() {
         
         {/* Başlık - Derimod Siyah/Altın Konsepti */}
         <header className="bg-gradient-to-r from-slate-900 to-slate-800 p-6 rounded-2xl shadow-md border border-slate-700 flex items-center gap-5">
-          <div className="bg-[#d4af37] p-3 rounded-xl text-slate-900 shadow-inner">
-            <Icon name="Clock" size={32} />
+          <div className="bg-[#d4af37] p-3 rounded-xl text-slate-900 shadow-inner flex items-center justify-center">
+            <i className="ph ph-clock text-3xl"></i>
           </div>
           <div>
             <h1 className="text-2xl font-bold text-white tracking-wide">MESAI TAKIP</h1>
@@ -187,13 +178,13 @@ function App() {
           <div className="space-y-6">
             <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
               <h2 className="text-lg font-bold flex items-center gap-2 mb-4 border-b pb-3 text-slate-800 uppercase tracking-wider text-sm">
-                <Icon name="Users" size={18} className="text-[#d4af37]" /> Aktif Personel
+                <i className="ph ph-users text-lg text-[#d4af37]"></i> Aktif Personel
               </h2>
               
               <form onSubmit={handleAddPerson} className="flex flex-col gap-3 mb-6">
                 <input type="text" placeholder="Yeni Personel Adı Soyadı" value={newPersonName} onChange={(e) => setNewPersonName(e.target.value)} className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#d4af37] transition-all" />
                 <button type="submit" disabled={!newPersonName.trim()} className="w-full bg-slate-900 hover:bg-black disabled:bg-slate-400 text-[#d4af37] px-4 py-3 rounded-xl transition-colors flex items-center justify-center gap-2 font-bold uppercase text-sm tracking-wider shadow-sm">
-                  <Icon name="UserPlus" size={18} /> Personel Ekle
+                  <i className="ph ph-user-plus text-lg"></i> Personel Ekle
                 </button>
               </form>
 
@@ -204,7 +195,9 @@ function App() {
                   activePersonnel.map(person => (
                     <div key={person.id} className="flex items-center justify-between bg-white px-4 py-3 rounded-xl border border-slate-100 shadow-sm">
                       <span className="font-semibold text-slate-700">{person.name}</span>
-                      <button onClick={() => handleArchivePerson(person.id)} className="text-yellow-600 p-2 rounded-lg hover:bg-yellow-50 transition-colors bg-yellow-50/50" title="İşten Çıkar"><Icon name="UserMinus" size={18} /></button>
+                      <button onClick={() => handleArchivePerson(person.id)} className="text-yellow-600 p-2 rounded-lg hover:bg-yellow-50 transition-colors bg-yellow-50/50" title="İşten Çıkar">
+                        <i className="ph ph-user-minus text-lg"></i>
+                      </button>
                     </div>
                   ))
                 )}
@@ -214,15 +207,19 @@ function App() {
             {inactivePersonnel.length > 0 && (
               <div className="bg-slate-100 p-6 rounded-2xl shadow-sm border border-slate-200">
                 <h2 className="text-sm font-bold flex items-center gap-2 mb-4 border-b border-slate-200 pb-3 text-slate-600 uppercase tracking-wider">
-                  <Icon name="UserX" size={18} /> İşten Çıkanlar
+                  <i className="ph ph-user-minus text-lg"></i> İşten Çıkanlar
                 </h2>
                 <div className="space-y-2 max-h-[200px] overflow-y-auto pr-2">
                   {inactivePersonnel.map(person => (
                     <div key={person.id} className="flex items-center justify-between bg-white px-4 py-3 rounded-xl border border-slate-200">
                       <span className="font-medium text-slate-400 text-sm line-through">{person.name}</span>
                       <div className="flex gap-2">
-                        <button onClick={() => handleRestorePerson(person.id)} className="text-emerald-600 p-2 rounded-lg hover:bg-emerald-50 transition-colors bg-emerald-50/50" title="Geri Al"><Icon name="RotateCcw" size={16} /></button>
-                        <button onClick={() => handlePermanentDeletePerson(person.id)} className="text-red-600 p-2 rounded-lg hover:bg-red-50 transition-colors bg-red-50/50" title="Kalıcı Sil"><Icon name="Trash2" size={16} /></button>
+                        <button onClick={() => handleRestorePerson(person.id)} className="text-emerald-600 p-2 rounded-lg hover:bg-emerald-50 transition-colors bg-emerald-50/50" title="Geri Al">
+                            <i className="ph ph-arrow-counter-clockwise text-base"></i>
+                        </button>
+                        <button onClick={() => handlePermanentDeletePerson(person.id)} className="text-red-600 p-2 rounded-lg hover:bg-red-50 transition-colors bg-red-50/50" title="Kalıcı Sil">
+                            <i className="ph ph-trash text-base"></i>
+                        </button>
                       </div>
                     </div>
                   ))}
@@ -235,10 +232,10 @@ function App() {
           <div className="lg:col-span-2 space-y-6">
             <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
               <h2 className="text-lg font-bold flex items-center gap-2 mb-4 border-b pb-3 text-slate-800 uppercase tracking-wider text-sm">
-                <Icon name="Plus" size={18} className="text-[#d4af37]" /> Yeni Mesai / Kullanım Ekle
+                <i className="ph ph-plus text-lg text-[#d4af37]"></i> Yeni Mesai / Kullanım Ekle
               </h2>
               
-              {errorMsg && <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-600 rounded-xl text-sm flex items-center gap-2"><Icon name="AlertTriangle" size={16} />{errorMsg}</div>}
+              {errorMsg && <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-600 rounded-xl text-sm flex items-center gap-2"><i className="ph ph-warning text-base"></i>{errorMsg}</div>}
 
               <form onSubmit={handleAddRecord} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                 <div className="space-y-1.5">
@@ -271,7 +268,7 @@ function App() {
 
                 <div className="flex items-end">
                   <button type="submit" className="w-full bg-slate-900 hover:bg-black text-[#d4af37] px-4 py-3 rounded-xl transition-colors flex items-center justify-center gap-2 font-bold uppercase text-sm tracking-wider">
-                    <Icon name="Save" size={18} /> Kaydet
+                    <i className="ph ph-floppy-disk text-lg"></i> Kaydet
                   </button>
                 </div>
               </form>
@@ -283,7 +280,7 @@ function App() {
         <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
           <div className="p-6 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
             <h2 className="text-lg font-bold flex items-center gap-2 text-slate-800 uppercase tracking-wider text-sm">
-              <Icon name="Calendar" size={18} className="text-[#d4af37]" /> Detay Tablosu
+              <i className="ph ph-calendar text-lg text-[#d4af37]"></i> Detay Tablosu
             </h2>
             <div className="flex items-center gap-3">
               <span className="text-xs font-bold bg-slate-900 text-[#d4af37] px-3 py-1.5 rounded-full tracking-wider">
@@ -298,7 +295,7 @@ function App() {
                 <tr className="bg-slate-50 text-slate-500 text-xs uppercase tracking-wider border-b border-slate-200">
                   <th className="px-6 py-4 font-bold min-w-[200px]">
                     <div className="flex flex-col gap-2">
-                      <span className="flex items-center gap-1"><Icon name="Filter" size={14} /> Personel İsmi</span>
+                      <span className="flex items-center gap-1"><i className="ph ph-funnel text-sm"></i> Personel İsmi</span>
                       <select value={filterPersonId} onChange={(e) => setFilterPersonId(e.target.value)} className="w-full px-2 py-2 bg-white border border-slate-300 rounded-lg text-slate-700 font-normal focus:outline-none focus:ring-1 focus:ring-slate-900">
                         <option value="">Tüm Personeller</option>
                         {activePersonnel.length > 0 && <optgroup label="Aktif Personel">{activePersonnel.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}</optgroup>}
@@ -335,7 +332,7 @@ function App() {
                         <td className="px-6 py-4 text-slate-500 text-sm">{record.tarih ? new Date(record.tarih).toLocaleDateString('tr-TR') : '-'}</td>
                         <td className={`px-6 py-4 text-center font-black text-lg ${kalanSaat > 0 ? 'text-green-600 bg-green-50/30' : kalanSaat < 0 ? 'text-red-600 bg-red-50/30' : 'text-slate-400'}`}>{kalanSaat}</td>
                         <td className="px-6 py-4 text-right">
-                          <button onClick={() => handleDeleteRecord(record.id)} className="text-red-400 hover:text-red-600 p-2 rounded-lg hover:bg-red-50 transition-colors bg-white border border-slate-100 shadow-sm"><Icon name="Trash2" size={16} /></button>
+                          <button onClick={() => handleDeleteRecord(record.id)} className="text-red-400 hover:text-red-600 p-2 rounded-lg hover:bg-red-50 transition-colors bg-white border border-slate-100 shadow-sm"><i className="ph ph-trash text-base"></i></button>
                         </td>
                       </tr>
                     );
@@ -346,7 +343,7 @@ function App() {
                 <tfoot className="bg-slate-900 border-t-4 border-[#d4af37]">
                   <tr>
                     <td className="px-6 py-5 font-bold text-white text-right uppercase text-xs tracking-wider">
-                      {filterPersonId ? `${getPerson(filterPersonId)?.name || ''} TOPLAM` : "GENEL TOPLAM"}
+                      {getToplamBaslik()}
                     </td>
                     <td className="px-6 py-5 font-black text-center text-white text-lg">{totals.alacak > 0 ? totals.alacak : '0'}</td>
                     <td className="px-6 py-5"></td>
@@ -371,4 +368,5 @@ root.render(<App />);
 </script>
 </body>
 </html>
+
 
